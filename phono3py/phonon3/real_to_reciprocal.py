@@ -49,7 +49,10 @@ class RealToReciprocal(object):
     def _real_to_reciprocal_elements(self, patom_indices):
         num_satom = self._supercell.get_number_of_atoms()
         pi = patom_indices
-        i = self._p2s_map[pi[0]]
+        if self._fc3.shape[0] == self._fc3.shape[1]:
+          i = self._p2s_map[pi[0]]
+        else:
+          i = pi[0]
         dtype = "c%d" % (np.dtype('double').itemsize * 2)
         fc3_reciprocal = np.zeros((3, 3, 3), dtype=dtype)
         for j in range(num_satom):

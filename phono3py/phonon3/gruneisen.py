@@ -68,6 +68,7 @@ def get_gruneisen_parameters(fc2,
     if log_level:
         print("Gruneisen parameters are written in %s" %
               (filename + filename_ext))
+    return gruneisen
 
 
 class Gruneisen(object):
@@ -92,7 +93,8 @@ class Gruneisen(object):
             self._dm = DynamicalMatrix(self._scell,
                                        self._pcell,
                                        self._fc2,
-                                       symprec=self._symprec)
+                                       decimals=-int(np.log10(symprec)))
+                                       #  symprec=self._symprec)
         else:
             self._dm = DynamicalMatrixNAC(self._scell,
                                           self._pcell,
@@ -332,7 +334,10 @@ class Gruneisen(object):
         fc3 = self._fc3
         num_atom_prim = self._pcell.get_number_of_atoms()
         num_atom_super = self._scell.get_number_of_atoms()
-        p2s = self._pcell.get_primitive_to_supercell_map()
+        if fc3.shape[0] == fc3.shape[1]:
+          p2s = self._pcell.get_primitive_to_supercell_map()
+        else:
+          p2s = np.arange(num_atom_prim)
         dPhidu = np.zeros((num_atom_prim, num_atom_super, 3, 3, 3, 3),
                           dtype=float)
 
@@ -378,7 +383,10 @@ class Gruneisen(object):
     def _get_X(self):
         num_atom_super = self._scell.get_number_of_atoms()
         num_atom_prim = self._pcell.get_number_of_atoms()
-        p2s = self._pcell.get_primitive_to_supercell_map()
+        if self._fc3.shape[0] == self._fc3.shape[1]:
+          p2s = self._pcell.get_primitive_to_supercell_map()
+        else:
+          p2s = np.arange(num_atom_prim)
         lat = self._pcell.get_cell()
         vecs = self._shortest_vectors
         multi = self._multiplicity
